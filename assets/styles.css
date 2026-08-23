@@ -328,7 +328,9 @@ p,li,blockquote,dd{text-wrap:pretty}
 .svc-row li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:1px;background:var(--accent)}
 
 /* ---------- GALLERY (realizacje) ---------- */
-.gallery{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--space-4);grid-auto-rows:200px}
+.gallery{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--space-4);grid-auto-rows:200px;grid-auto-flow:row dense}
+/* kafel na zdjęcie PIONOWE (szafa, słupek, wąska kuchnia) — dwa rzędy zamiast paska */
+.tile.t-tall2{grid-row:span 2}
 /* GALERIA MASONRY — pionowe zdjęcia (portrety beauty/wellness) bez przycinania: kolumny, height auto */
 .gallery-masonry{column-count:3;column-gap:var(--space-4)}
 @media(max-width:900px){.gallery-masonry{column-count:2}}
