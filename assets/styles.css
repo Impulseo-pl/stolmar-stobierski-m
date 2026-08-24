@@ -1663,3 +1663,14 @@ footer{view-transition-name:mt-foot}
 .btn-accent{color:#fff}
 .nav .nav-links a.btn-accent{color:#fff}
 .btn-accent[data-accent-d],.cta-d .btn-accent{color:#fff}
+
+/* === auto-paleta z LOGO klienta (24.08.2026 — logo przysłane przez klienta przez Adama) ===
+   Logo wygrywa hierarchię źródeł koloru: burgund z banku palet ustępuje czerwieni marki. */
+:root{--accent:#BE464B;--accent-d:#A62F37;--accent-soft:rgba(190,70,75,0.10);--gold:#BE464B;
+  --paper:#FFF8F8;--paper-2:#FAEDEC;--paper-3:#F3E1E0;--ink:#2D1B1B;--ink-soft:#574141;
+  --muted:#897776;--line:rgba(45,27,27,.12);}
+.btn-accent{color:#fff}
+.nav .nav-links a.btn-accent{color:#fff}
+.btn-accent[data-accent-d],.cta-d .btn-accent{color:#fff}
+/* szary tekst dociągnięty do czytelności na nowym papierze (WCAG 4.5) */
+:root{--muted:#726260;}
