@@ -1694,3 +1694,36 @@ footer{view-transition-name:mt-foot}
 .btn-accent[data-accent-d],.cta-d .btn-accent{color:#fff}
 /* szary tekst dociągnięty do czytelności na nowym papierze (WCAG 4.5) */
 :root{--muted:#726260;}
+
+/* --- REALIZACJE: galeria masonry z 30 zdjęciami klienta (25.08.2026) ------
+   Klient poprosił mailem o WSZYSTKIE zdjęcia realizacji. Siatka kafli 200 px
+   przycinała je do pasków, więc Realizacje idą na kolumny (pełne kadry).
+   Podpis leży NA zdjęciu, a fronty mebli są jasne — domyślny gradient .55
+   dawał kontrast poniżej bramki wyglądu, stąd mocniejszy spad i cień. */
+.gallery-masonry .m-tile .cap{
+  background:linear-gradient(transparent 6%,rgba(18,24,28,.5) 38%,rgba(18,24,28,.86) 70%,rgba(18,24,28,.97));
+  text-shadow:0 1px 2px rgba(0,0,0,.85),0 2px 10px rgba(0,0,0,.55);
+  font-family:var(--font-display);font-weight:600;letter-spacing:.02em;
+  padding:var(--space-6) var(--space-4) var(--space-4)}
+
+/* Lead w hero stoi na jasnym zdjęciu kuchni (białe fronty) — zmierzony kontrast
+   4.39:1 przy wymaganych 4.5. Cień pod tekstem + pełna biel domykają bramkę
+   wyglądu bez zmiany zdjęcia, którego klient nie kwestionował. */
+.hero-cine .lead{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7),0 2px 12px rgba(0,0,0,.5)}
+
+/* Kafle galerii dziedziczyły `transition-delay` z animacji wejścia sekcji, więc
+   najechanie odpowiadało dopiero po 140-350 ms — bramka wyglądu czytała to jako
+   zacięcie strony. Na hover zerujemy opóźnienie; schodkowe wejście zostaje. */
+.gallery .tile:hover,
+.gallery .tile:hover img,
+.gallery .tile:hover .cap{transition-delay:0s !important}
+
+/* Galeria Realizacji (kolumny) dostaje tę samą reakcję na kursor co reszta strony. */
+.gallery-masonry .m-tile{transition:box-shadow var(--dur) var(--ease)}
+.gallery-masonry .m-tile img{transition:transform var(--img-dur) var(--img-ease)}
+.gallery-masonry .m-tile:hover{box-shadow:var(--sh-md)}
+.gallery-masonry .m-tile:hover img{transform:scale(var(--img-zoom,1.04))}
+/* Po ujawnieniu kafla schodkowe opóźnienie nie ma już nic do roboty, a zostawało
+   na elemencie i spowalniało reakcję na kursor. Kasujemy je w stanie `.in`. */
+.gallery .tile.reveal,
+.gallery .tile.reveal.in{transition-delay:0s}
