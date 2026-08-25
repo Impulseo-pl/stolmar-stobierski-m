@@ -546,7 +546,7 @@ section{padding-block:clamp(64px,8vw,128px)}
 .nav.is-stuck .nav-inner{height:70px}
 .brand-has-logo .brand-logo{height:56px}
 .nav.is-stuck .brand-has-logo .brand-logo{height:46px}
-.brand-owner{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);
+.brand-owner{font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);
   white-space:nowrap;line-height:1.2}
 .nav.is-stuck .brand-owner{font-size:.56rem}
 @media(max-width:680px){
