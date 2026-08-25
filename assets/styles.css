@@ -536,6 +536,27 @@ section{padding-block:clamp(64px,8vw,128px)}
 .nav.is-stuck .brand-logo{height:52px}
 @media(max-width:680px){.brand-logo{height:46px;max-width:210px}}
 
+/* nazwisko właściciela obok logo w pasku (prośba klienta 25.08.2026):
+   logo niesie już nazwę i branżę, więc podpis daje się drobnym rozstrzelonym wersalikiem —
+   nie konkuruje z logotypem, a mówi, kto za firmą stoi. Kreskę bierzemy z --line, bo pionowa
+   belka jest już WEWNĄTRZ logo i druga taka sama czytałaby się jak powtórka. */
+.brand-has-logo{flex-direction:column;align-items:flex-start;gap:5px}
+/* pasek musi pomieścić logo + podpis pod nim — bez tego podpis ucinała dolna krawędź */
+.nav-inner{height:86px}
+.nav.is-stuck .nav-inner{height:70px}
+.brand-has-logo .brand-logo{height:56px}
+.nav.is-stuck .brand-has-logo .brand-logo{height:46px}
+.brand-owner{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);
+  white-space:nowrap;line-height:1.2}
+.nav.is-stuck .brand-owner{font-size:.56rem}
+@media(max-width:680px){
+  .brand-owner{font-size:.54rem;letter-spacing:.16em}
+  .brand-has-logo .brand-logo{height:44px}
+  .nav-inner{height:74px}
+  /* menu mobilne wysuwa się spod paska — musi startować dokładnie na jego wysokości */
+  .nav-links{inset:74px 0 auto 0}
+}
+
 
 /* === RWD: nagłówki na wąskich ekranach (dodane 17.07.2026 razem z fixem clamp) ===
    Po przywróceniu działania clamp() dolna granica --text-h1 (2.9rem) rozpychała
