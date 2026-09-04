@@ -176,7 +176,7 @@ p,li,blockquote,dd{text-wrap:pretty}
    geometrię wyzerować i wpisać połysk z nazwy - samo `display:none` gasiło efekt. */
 .nav-links a.btn::after{
   display:block;content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
-  inset:0;width:auto;height:auto;border-radius:inherit;   /* kasuje geometrię podkreślenia (width:0;height:1.5px) */
+  width:auto;height:auto;border-radius:inherit;   /* kasuje geometrię podkreślenia (width:0;height:1.5px) */
   background:linear-gradient(100deg,transparent 32%,rgba(255,255,255,.20) 50%,transparent 68%);
   translate:-120% 0}
 @media (prefers-reduced-motion:no-preference){
