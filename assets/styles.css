@@ -339,6 +339,62 @@ p,li,blockquote,dd{text-wrap:pretty}
 .gallery-masonry .m-tile img{width:100%;height:auto;display:block}
 .gallery-masonry .m-tile .cap{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);color:#fff;background:linear-gradient(0deg,rgba(0,0,0,.55),transparent);font-size:var(--text-sm)}
 .gallery-masonry .m-tile .cap small{display:block;font-weight:400;opacity:.78;letter-spacing:.04em;text-transform:uppercase;font-size:.66rem;margin-top:3px}
+
+/* ---------- FILTRY GALERII (realizacje) ----------
+   Pasek startuje z atrybutem `hidden` i odsłania go dopiero JS: bez skryptu guziki
+   byłyby martwe, a galeria i tak pokazuje komplet. `[hidden]` musi mieć własną regułę,
+   bo `display:flex` z klasy wygrałoby z domyślnym `display:none` przeglądarki. */
+.gal-filtry{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-6)}
+.gal-filtry[hidden]{display:none}
+.gf{font-family:inherit;font-size:var(--text-sm);font-weight:600;line-height:1.2;color:var(--ink-soft);
+  background:#fff;border:var(--hairline);border-radius:999px;padding:11px 20px;cursor:pointer;
+  transition:color var(--dur) var(--ease),background var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+/* licznik trzyma TEN SAM kolor co etykieta - osobna, jaśniejsza szarość spadała
+   poniżej 4,5:1 na aktywnym guziku (bramka wyglądu liczy kontrast z pikseli). */
+.gf .n{font-weight:500;font-variant-numeric:tabular-nums;opacity:1}
+@media(hover:hover){.gf:hover{border-color:var(--accent);color:var(--accent-d)}}
+.gf[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.gf:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* ukrycie kafla przy filtrowaniu: display:none, bo column-count przelicza kolumny
+   dopiero gdy element WYPADNIE z układu - przy visibility/height zostają dziury. */
+.gallery-masonry .m-tile.off{display:none}
+.gallery-masonry .m-tile{cursor:zoom-in}
+.gallery-masonry .m-tile:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.gal-pusto{color:var(--ink-soft);font-size:var(--text-base)}
+
+/* ---------- POWIĘKSZENIE ZDJĘCIA (lightbox) ----------
+   Pisany od zera, zero bibliotek z zewnątrz. Otwiera się z galerii, chodzi
+   strzałkami/Esc/gestem, a nawigacja trzyma się AKTUALNIE przefiltrowanego zbioru. */
+html.lb-lock,body.lb-lock{overflow:hidden}
+.lb{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;
+  padding:clamp(14px,3vw,40px);background:rgba(20,18,16,.95);
+  opacity:0;transition:opacity .2s var(--ease)}
+.lb.open{display:flex}
+.lb.shown{opacity:1}
+.lb-fig{margin:0;display:flex;flex-direction:column;align-items:center;gap:var(--space-4);max-width:100%}
+.lb-img{max-width:100%;max-height:calc(100vh - 200px);width:auto;height:auto;
+  border-radius:var(--r-md);box-shadow:0 30px 80px -24px rgba(0,0,0,.75)}
+.lb-cap{color:#fff;text-align:center;font-size:var(--text-base);font-weight:600;max-width:60ch}
+.lb-cap .lb-nr{display:block;margin-top:4px;font-weight:400;color:rgba(255,255,255,.78);font-size:var(--text-sm)}
+.lb-btn{position:absolute;display:grid;place-items:center;width:54px;height:54px;padding:0;
+  border:1px solid rgba(255,255,255,.3);border-radius:50%;background:rgba(255,255,255,.12);
+  color:#fff;cursor:pointer;transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+@media(hover:hover){.lb-btn:hover{background:rgba(255,255,255,.24);border-color:rgba(255,255,255,.55)}}
+.lb-btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.lb-btn svg{width:24px;height:24px}
+.lb-close{top:clamp(12px,2vw,22px);right:clamp(12px,2vw,22px)}
+.lb-prev{left:clamp(12px,2.4vw,28px);top:50%;transform:translateY(-50%)}
+.lb-next{right:clamp(12px,2.4vw,28px);top:50%;transform:translateY(-50%)}
+/* telefon: strzałki schodzą na dół, pod kciuk, i rosną - w rogu ekranu nikt ich nie trafia */
+@media(max-width:760px){
+  /* `env(safe-area-inset-bottom)` odsuwa strzalki od paska gestow iPhone'a */
+  .lb-prev,.lb-next{top:auto;bottom:max(18px,env(safe-area-inset-bottom));transform:none;width:60px;height:60px}
+  .lb-prev{left:calc(50% - 78px)}
+  .lb-next{right:calc(50% - 78px)}
+  .lb-img{max-height:calc(100vh - 260px)}
+  .lb-cap{font-size:var(--text-sm)}
+}
+@media(prefers-reduced-motion:reduce){.lb{transition:none}}
 .tile{position:relative;overflow:hidden;border-radius:var(--r-md);box-shadow:var(--sh-sm);
   transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
 .tile img{width:100%;height:100%;object-fit:cover;

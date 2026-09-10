@@ -739,3 +739,194 @@
 
 /* === licznik otwarć demo (buy-signal) + geo === */
 (function(){try{if(String(location.protocol).indexOf('http')!==0)return;try{if(/[?&#]team=1/.test(location.search+location.hash)){localStorage.setItem('nb_team','1');}}catch(e){}try{if(localStorage.getItem('nb_team')==='1')return;}catch(e){}if((document.referrer||'').indexOf('crm-newbeginning')>-1)return;try{if(navigator.webdriver)return;}catch(e){}try{if(/^https?:\/\/(kris20032|impulseo-pl)\.github\.io\/?$/i.test(document.referrer||''))return;}catch(e){}if(sessionStorage.getItem('_dv'))return;sessionStorage.setItem('_dv','1');var seg=(location.pathname.split('/').filter(Boolean)[0])||'';var base=location.origin+(seg?('/'+seg):'');var ua='';try{ua=(navigator.userAgent||'').slice(0,300);}catch(e){}var EP='https://zngfubfinbojfgaxdrbf.supabase.co/rest/v1/demo_views';var KEY='sb_publishable_MWwoyGlSCWnJ4awtOPF0ow_ZVS0Y8qK';function send(g){try{fetch(EP,{method:'POST',keepalive:true,headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY,'Prefer':'return=minimal'},body:JSON.stringify({demo_url:base,page:location.pathname,referrer:(document.referrer||null),user_agent:(ua||null),ip:(g&&g.ip)||null,country:(g&&g.cc)||null,city:(g&&g.city)||null})}).catch(function(){});}catch(e){}}var done=false;function once(g){if(done)return;done=true;send(g);}try{var t=setTimeout(function(){once(null);},1500);fetch('https://ipwho.is/?fields=ip,success,country_code,city',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){clearTimeout(t);once(d&&d.success!==false?{ip:d.ip,cc:d.country_code,city:d.city}:null);}).catch(function(){clearTimeout(t);once(null);});}catch(e){once(null);}}catch(e){}})();
+
+
+/* === GALERIA REALIZACJI: filtry kategorii + powiększanie zdjęcia (10.09.2026) ===
+   Kategoria siedzi na kafelku w `data-kat`. Ukrywamy klasą `.off` (display:none) —
+   tylko wtedy `column-count` przelicza kolumny i nie zostawia dziur po ukrytych kaflach.
+   Lightbox pisany od zera: strona nie ładuje NICZEGO z zewnątrz poza fontami Google. */
+(function () {
+  var gal = document.querySelector('.gallery-masonry');
+  if (!gal) return;
+  var kafle = Array.prototype.slice.call(gal.querySelectorAll('.m-tile'));
+  if (!kafle.length) return;
+  var widoczne = kafle.slice();
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function podpis(t) { var c = t.querySelector('.cap'); return c ? c.textContent.trim() : ''; }
+
+  /* ---------- doładowanie zdjęć po zmianie układu ----------
+     Lekcja 2026-09-10-010: po przefiltrowaniu kafle wskakują w górę, a `loading="lazy"`
+     przypisane przy pierwszym układzie potrafi zostawić puste miejsca. Zdejmujemy `lazy`
+     z tego, co weszło w kadr (albo tuż pod niego) — przeglądarka pobiera zdjęcie od razu. */
+  function dosyp() {
+    var h = window.innerHeight || 800;
+    widoczne.forEach(function (t) {
+      var img = t.querySelector('img');
+      if (!img || !img.hasAttribute('loading')) return;
+      var r = t.getBoundingClientRect();
+      if (r.top < h * 2 && r.bottom > -h) img.removeAttribute('loading');
+    });
+  }
+
+  /* kafle odsłonięte filtrem nie przeszły przez observer `.reveal` — zostałyby puste */
+  function odslon() {
+    var h = window.innerHeight || 800;
+    widoczne.forEach(function (t) {
+      var r = t.getBoundingClientRect();
+      if (r.top < h * 1.15 && r.bottom > -40) t.classList.add('in');
+    });
+  }
+
+  /* ---------- 1) PASEK FILTRÓW ---------- */
+  var pasek = document.querySelector('.gal-filtry');
+  if (pasek) {
+    pasek.hidden = false;   // bez JS guziki byłyby martwe, więc pokazujemy je dopiero tutaj
+    pasek.addEventListener('click', function (e) {
+      var b = e.target;
+      while (b && b !== pasek && !(b.classList && b.classList.contains('gf'))) b = b.parentNode;
+      if (!b || b === pasek) return;
+      Array.prototype.forEach.call(pasek.querySelectorAll('.gf'), function (x) {
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+      filtruj(b.getAttribute('data-filtr'));
+    });
+  }
+
+  function filtruj(kat) {
+    kafle.forEach(function (t) {
+      t.classList.toggle('off', !(kat === 'all' || t.getAttribute('data-kat') === kat));
+    });
+    widoczne = kafle.filter(function (t) { return !t.classList.contains('off'); });
+    dosyp();
+    odslon();
+    // 40 kafli -> 2 kafle: strona nagle się skraca i gość zostaje pod galerią, przy stopce.
+    // Cofamy go na początek galerii tylko wtedy, gdy naprawdę jest już nad nim.
+    var kot = pasek || gal;
+    if (kot.getBoundingClientRect().top < 0) {
+      window.scrollTo({ top: kot.getBoundingClientRect().top + window.pageYOffset - 90,
+                        behavior: reduce ? 'auto' : 'smooth' });
+    }
+  }
+
+  var tik = false;
+  window.addEventListener('scroll', function () {
+    if (tik) return; tik = true;
+    requestAnimationFrame(function () { dosyp(); tik = false; });
+  }, { passive: true });
+
+  /* ---------- 2) POWIĘKSZENIE ZDJĘCIA ---------- */
+  var IKONY = {
+    x: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    l: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    r: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  var lb = document.createElement('div');
+  lb.className = 'lb';
+  lb.setAttribute('role', 'dialog');
+  lb.setAttribute('aria-modal', 'true');
+  lb.setAttribute('aria-label', 'Powiększone zdjęcie realizacji');
+  lb.innerHTML =
+    '<button type="button" class="lb-btn lb-close" aria-label="Zamknij powiększenie">' + IKONY.x + '</button>' +
+    '<button type="button" class="lb-btn lb-prev" aria-label="Poprzednie zdjęcie">' + IKONY.l + '</button>' +
+    '<button type="button" class="lb-btn lb-next" aria-label="Następne zdjęcie">' + IKONY.r + '</button>' +
+    '<figure class="lb-fig">' +
+      '<img class="lb-img" alt="">' +
+      '<figcaption class="lb-cap"><span class="lb-txt"></span><span class="lb-nr"></span></figcaption>' +
+    '</figure>';
+  document.body.appendChild(lb);
+
+  var lbImg = lb.querySelector('.lb-img');
+  var lbTxt = lb.querySelector('.lb-txt');
+  var lbNr = lb.querySelector('.lb-nr');
+  var bZamknij = lb.querySelector('.lb-close');
+  var bPrev = lb.querySelector('.lb-prev');
+  var bNext = lb.querySelector('.lb-next');
+  var poz = -1, skad = null;
+
+  function pokaz(i) {
+    if (!widoczne.length) return;
+    poz = (i + widoczne.length) % widoczne.length;
+    var t = widoczne[poz];
+    var img = t.querySelector('img');
+    lbImg.src = img.getAttribute('src');
+    lbImg.alt = img.getAttribute('alt') || podpis(t);
+    lbTxt.textContent = podpis(t);
+    lbNr.textContent = 'Zdjęcie ' + (poz + 1) + ' z ' + widoczne.length;
+    // sąsiedzi do pamięci przeglądarki — przy strzałkach nic nie mruga
+    [widoczne[(poz + 1) % widoczne.length], widoczne[(poz - 1 + widoczne.length) % widoczne.length]]
+      .forEach(function (s) { if (s) { var p = new Image(); p.src = s.querySelector('img').getAttribute('src'); } });
+    var jeden = widoczne.length < 2;
+    bPrev.hidden = jeden;
+    bNext.hidden = jeden;
+  }
+
+  function otworz(t) {
+    var i = widoczne.indexOf(t);
+    if (i < 0) return;
+    skad = t;
+    pokaz(i);
+    document.documentElement.classList.add('lb-lock');
+    document.body.classList.add('lb-lock');
+    lb.classList.add('open');
+    requestAnimationFrame(function () { lb.classList.add('shown'); });
+    bZamknij.focus();
+  }
+
+  function zamknij() {
+    lb.classList.remove('shown');
+    var koniec = function () {
+      if (lb.classList.contains('shown')) return;   // ktoś zdążył otworzyć je ponownie
+      lb.classList.remove('open');
+      document.documentElement.classList.remove('lb-lock');
+      document.body.classList.remove('lb-lock');
+      lbImg.removeAttribute('src');
+      if (skad) { skad.focus(); skad = null; }
+    };
+    if (reduce) koniec(); else setTimeout(koniec, 200);
+  }
+
+  bZamknij.addEventListener('click', zamknij);
+  bPrev.addEventListener('click', function () { pokaz(poz - 1); });
+  bNext.addEventListener('click', function () { pokaz(poz + 1); });
+  lb.addEventListener('click', function (e) { if (e.target === lb || e.target === lb.querySelector('.lb-fig')) zamknij(); });
+
+  document.addEventListener('keydown', function (e) {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') { e.preventDefault(); zamknij(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); pokaz(poz + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); pokaz(poz - 1); }
+    else if (e.key === 'Tab') {
+      // fokus zostaje w oknie — bez tego Tab ucieka na stronę pod spodem
+      var gz = [bZamknij, bPrev, bNext].filter(function (b) { return !b.hidden; });
+      var i = gz.indexOf(document.activeElement);
+      e.preventDefault();
+      gz[(i + (e.shiftKey ? -1 : 1) + gz.length) % gz.length].focus();
+    }
+  });
+
+  // telefon: przesunięcie palcem zmienia zdjęcie
+  var x0 = null, y0 = null;
+  lb.addEventListener('touchstart', function (e) {
+    if (e.touches.length !== 1) { x0 = null; return; }
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+  }, { passive: true });
+  lb.addEventListener('touchend', function (e) {
+    if (x0 === null || !e.changedTouches.length) return;
+    var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    x0 = null;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) pokaz(poz + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+
+  kafle.forEach(function (t) {
+    t.setAttribute('role', 'button');
+    t.setAttribute('tabindex', '0');
+    t.setAttribute('aria-label', 'Powiększ zdjęcie: ' + podpis(t));
+    t.addEventListener('click', function () { otworz(t); });
+    t.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); otworz(t); }
+    });
+  });
+
+  dosyp();
+})();
